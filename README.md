@@ -54,7 +54,7 @@ pip install numpy scipy matplotlib
 3.  **Run the analysis scripts:**
     Execute the Python scripts from your terminal:
     ```bash
-    python your_script_name.py
+    python analysis.py
     ```
     This will generate and display the plots corresponding to the different stages of the analysis.
 
