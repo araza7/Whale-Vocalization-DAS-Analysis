@@ -45,7 +45,7 @@ pip install numpy scipy matplotlib
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YourUsername/Whale-Vocalization-DAS-Analysis.git
+    git clone https://github.com/araza7/Whale-Vocalization-DAS-Analysis.git
     cd Whale-Vocalization-DAS-Analysis
     ```
 2.  **Place the dataset:**
