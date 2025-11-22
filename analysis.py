@@ -13,20 +13,38 @@ class DASData:
         print(f"Loading data from {mat_file_path}...")
         try:
             mat = loadmat(mat_file_path)
-            # Load strain data and convert to float64 for precision
+            # Load raw data
             self.strain = mat['data'].astype(np.float64)
             
-            # Extract metadata
+            # Load metadata
             self.fs = float(mat['info_sampling_frequency_Hz'][0, 0])
             self.dt = float(mat['info_sample_interval_s'][0, 0])
-            
-            # Spatial data conversion (meters to km)
             self.channel_dist_m = mat['x1_position_m'][0]
             self.time_s = mat['x2_time_s'][0]
-            self.dist_km = self.channel_dist_m / 1000
             
+            # --- TIME SLICING IMPLEMENTATION (60s to 80s) ---
+            t_start = 60.0
+            t_end = 80.0
+            
+            # Find indices corresponding to the time range
+            # We use searchsorted for efficiency and precision
+            idx_start = np.searchsorted(self.time_s, t_start)
+            idx_end = np.searchsorted(self.time_s, t_end)
+            
+            print(f"Slicing data from {t_start}s to {t_end}s (Indices: {idx_start}-{idx_end})...")
+            
+            # Slice the data matrix [channels, time] and the time vector
+            self.strain = self.strain[:, idx_start:idx_end]
+            self.time_s = self.time_s[idx_start:idx_end]
+            # ------------------------------------------------
+            
+            self.dist_km = self.channel_dist_m / 1000
             self.n_channels, self.n_samples = self.strain.shape
-            print(f"Data loaded successfully. Range: {self.dist_km[0]:.2f} - {self.dist_km[-1]:.2f} km.")
+            
+            print(f"Data loaded successfully. "
+                  f"Time: {self.time_s[0]:.2f}-{self.time_s[-1]:.2f}s, "
+                  f"Distance: {self.dist_km[0]:.2f}-{self.dist_km[-1]:.2f} km.")
+                  
         except (FileNotFoundError, KeyError) as e:
             print(f"ERROR: Could not load or parse the .mat file: {e}")
             sys.exit()
@@ -119,12 +137,12 @@ def Plot_figures(das):
 
     plt.show()
 
-
-
-
-
-if __name__ == '__main__':
-    main()
+def main():
+    """Main function to run the analysis."""
+    # Ensure this path is correct on your machine
     mat_file_path = '/kaggle/input/dataset/20200627_052441_ch08751_to_ch10000_whale_raw_L160s.mat'
     das = DASData(mat_file_path)
     Plot_figures(das)
+
+if __name__ == '__main__':
+    main()
